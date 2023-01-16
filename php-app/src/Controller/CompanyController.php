@@ -44,10 +44,13 @@ class CompanyController extends AbstractController
     public function show(Company $company): Response
     {
         $prices = $this->getHistoricalPrices();
+        $graphData = $this->getGraphData($prices);
 
         return $this->render('company/show.html.twig', [
             'company' => $company,
-            'prices' => $prices
+            'prices' => $prices,
+            'openData' => $graphData->open,
+            'closeData' => $graphData->close
         ]);
     }
 
@@ -77,6 +80,19 @@ class CompanyController extends AbstractController
         }
 
         return $this->redirectToRoute('app_company_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    private function getGraphData(Array $prices): \stdClass
+    {
+        $graphData = new \stdClass();
+        $graphData->open = [];
+        $graphData->close = []; 
+        foreach ($prices as $key => $value) {
+            array_push($graphData->open, [$value->date, $value->open]);
+            array_push($graphData->close, [$value->date, $value->close]);
+        }
+
+        return $graphData;
     }
 
     private function getHistoricalPrices(String $symbol = 'XYZ'): Array
