@@ -43,8 +43,11 @@ class CompanyController extends AbstractController
     #[Route('/{id}', name: 'app_company_show', methods: ['GET'])]
     public function show(Company $company): Response
     {
+        $prices = $this->getHistoricalPrices();
+
         return $this->render('company/show.html.twig', [
             'company' => $company,
+            'prices' => $prices
         ]);
     }
 
@@ -74,5 +77,38 @@ class CompanyController extends AbstractController
         }
 
         return $this->redirectToRoute('app_company_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    private function getHistoricalPrices(String $symbol = 'XYZ'): Array
+    {
+        $curl = curl_init();
+
+        curl_setopt_array($curl, [
+            CURLOPT_URL => "https://yh-finance.p.rapidapi.com/stock/v3/get-historical-data?symbol=AMRN&region=US",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => [
+                "X-RapidAPI-Host: yh-finance.p.rapidapi.com",
+                "X-RapidAPI-Key: 951235bde4mshb1262ddc2421abap150a23jsnfd580e76068c"
+            ],
+        ]);
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        curl_close($curl);
+
+        if ($err) {
+            $response = [];
+        } else {
+            $response = json_decode($response);
+        }
+
+        return $response->prices;
     }
 }
