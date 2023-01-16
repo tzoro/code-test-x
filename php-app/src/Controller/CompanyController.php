@@ -110,7 +110,7 @@ class CompanyController extends AbstractController
             CURLOPT_CUSTOMREQUEST => "GET",
             CURLOPT_HTTPHEADER => [
                 "X-RapidAPI-Host: yh-finance.p.rapidapi.com",
-                "X-RapidAPI-Key: 951235bde4mshb1262ddc2421abap150a23jsnfd580e76068c"
+                "X-RapidAPI-Key: " . $this->getParameter('app.rapid_api_key')
             ],
         ]);
 
