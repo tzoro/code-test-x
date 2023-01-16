@@ -95,12 +95,12 @@ class CompanyController extends AbstractController
         return $graphData;
     }
 
-    private function getHistoricalPrices(String $symbol = 'XYZ'): Array
+    private function getCurlGetData(String $url = '', Array $headers = []): String
     {
         $curl = curl_init();
 
         curl_setopt_array($curl, [
-            CURLOPT_URL => "https://yh-finance.p.rapidapi.com/stock/v3/get-historical-data?symbol=AMRN&region=US",
+            CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_ENCODING => "",
@@ -108,10 +108,7 @@ class CompanyController extends AbstractController
             CURLOPT_TIMEOUT => 30,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_HTTPHEADER => [
-                "X-RapidAPI-Host: yh-finance.p.rapidapi.com",
-                "X-RapidAPI-Key: " . $this->getParameter('app.rapid_api_key')
-            ],
+            CURLOPT_HTTPHEADER => $headers,
         ]);
 
         $response = curl_exec($curl);
@@ -121,10 +118,21 @@ class CompanyController extends AbstractController
 
         if ($err) {
             $response = [];
-        } else {
-            $response = json_decode($response);
         }
 
-        return $response->prices;
+        return $response;
+    }
+
+    private function getHistoricalPrices(String $symbol = 'XYZ'): Array
+    {
+        $url = "https://yh-finance.p.rapidapi.com/stock/v3/get-historical-data?symbol=AMRN&region=US";
+        $headers = [
+            "X-RapidAPI-Host: yh-finance.p.rapidapi.com",
+            "X-RapidAPI-Key: " . $this->getParameter('app.rapid_api_key')
+        ];
+
+        $response = $this->getCurlGetData($url, $headers);
+
+        return json_decode($response)->prices;
     }
 }
