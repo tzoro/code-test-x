@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Company;
 use App\Form\CompanyType;
+use App\Service\CurlGet;
 use App\Repository\CompanyRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -41,9 +42,9 @@ class CompanyController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_company_show', methods: ['GET'])]
-    public function show(Company $company): Response
+    public function show(Company $company, CurlGet $curlGet): Response
     {
-        $prices = $this->getHistoricalPrices();
+        $prices = $this->getHistoricalPrices($curlGet);
         $graphData = $this->getGraphData($prices);
 
         return $this->render('company/show.html.twig', [
@@ -95,35 +96,7 @@ class CompanyController extends AbstractController
         return $graphData;
     }
 
-    private function getCurlGetData(String $url = '', Array $headers = []): String
-    {
-        $curl = curl_init();
-
-        curl_setopt_array($curl, [
-            CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_HTTPHEADER => $headers,
-        ]);
-
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-
-        curl_close($curl);
-
-        if ($err) {
-            $response = [];
-        }
-
-        return $response;
-    }
-
-    private function getHistoricalPrices(String $symbol = 'XYZ'): Array
+    private function getHistoricalPrices(CurlGet $curlGet): Array
     {
         $url = "https://yh-finance.p.rapidapi.com/stock/v3/get-historical-data?symbol=AMRN&region=US";
         $headers = [
@@ -131,7 +104,7 @@ class CompanyController extends AbstractController
             "X-RapidAPI-Key: " . $this->getParameter('app.rapid_api_key')
         ];
 
-        $response = $this->getCurlGetData($url, $headers);
+        $response = $curlGet->getData($url, $headers);
 
         return json_decode($response)->prices;
     }
