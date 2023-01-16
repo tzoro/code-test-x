@@ -5,3 +5,7 @@ controllers:
 kernel:
     resource: ../src/Kernel.php
     type: annotation
+
+root_route_config:
+    path: /
+    controller: App\Controller\CompanyController::index
