@@ -15,7 +15,7 @@ class CompanyType extends AbstractType
         $dateWidgetConfig = [
             'widget' => 'single_text',
             'html5' => false,
-            'attr' => ['class' => 'js-datepicker'],
+            'attr' => ['class' => 'js-datepicker', 'autocomplete' => 'off'],
             'format'=>'yyyy-mm-dd'
         ];
 
