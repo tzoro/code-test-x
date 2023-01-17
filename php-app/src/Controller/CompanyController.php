@@ -29,10 +29,11 @@ class CompanyController extends AbstractController
                 'From ' . $company->getStartDate()->format('Y-m-d') . ' to ' . $company->getEndDate()->format('Y-m-d')
             );
 
-            $prices = $this->getHistoricalPrices($curlGet);
+            $prices = $this->getHistoricalPrices($company->getCompanySymbol(), $curlGet);
             $graphData = $this->getGraphData($prices);
 
             return $this->render('company/show.html.twig', [
+                'company' => $company,
                 'prices' => $prices,
                 'openData' => $graphData->open,
                 'closeData' => $graphData->close
@@ -49,18 +50,22 @@ class CompanyController extends AbstractController
     {
         $graphData = new \stdClass();
         $graphData->open = [];
-        $graphData->close = []; 
+        $graphData->close = [];
+
         foreach ($prices as $key => $value) {
-            array_push($graphData->open, [$value->date, $value->open]);
-            array_push($graphData->close, [$value->date, $value->close]);
+            if( isset($value->open) && isset($value->close) ) {
+                array_push($graphData->open, [$value->date, $value->open]);
+                array_push($graphData->close, [$value->date, $value->close]);
+            }
         }
 
         return $graphData;
     }
 
-    private function getHistoricalPrices(CurlGet $curlGet): Array
+    private function getHistoricalPrices(string $company, CurlGet $curlGet): Array
     {
-        $url = "https://yh-finance.p.rapidapi.com/stock/v3/get-historical-data?symbol=AMRN&region=US";
+        $url = "https://yh-finance.p.rapidapi.com/stock/v3/get-historical-data?symbol=" . $company . "&region=US";
+
         $headers = [
             "X-RapidAPI-Host: yh-finance.p.rapidapi.com",
             "X-RapidAPI-Key: " . $this->getParameter('app.rapid_api_key')

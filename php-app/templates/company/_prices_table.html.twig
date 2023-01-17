@@ -12,6 +12,7 @@
         </thead>
         <tbody>
         {% for price in prices %}
+            {% if price.open is defined and price.close is defined %}
             <tr>
                 <td>{{ price.date|date("m/d/Y", false) }}</td>
                 <td>{{ price.open }}</td>
@@ -20,6 +21,7 @@
                 <td>{{ price.close }}</td>
                 <td>{{ price.volume }}</td>
             </tr>
+            {% endif %}
         {% else %}
             <tr>
                 <td colspan="6">no records found</td>

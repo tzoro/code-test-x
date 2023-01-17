@@ -1,12 +1,12 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Company{% endblock %}
+{% block title %}{{ company.getCompanySymbol }} - Historical prices{% endblock %}
 
 {% block body %}
-    <h1>Company</h1>
+    <h1>{{ company.getCompanySymbol }}</h1>
 
     {{ include('company/_graph.html.twig') }}
     {{ include('company/_prices_table.html.twig') }}
 
-    <a href="{{ path('app_company_new') }}">back to form</a>
+    <a href="{{ path('app_company_new') }}">Back to search</a>
 {% endblock %}
