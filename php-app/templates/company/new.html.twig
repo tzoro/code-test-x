@@ -1,11 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Company{% endblock %}
+{% block title %}Find Company historical prices{% endblock %}
 
 {% block body %}
-    <h1>Create new Company</h1>
+    <h1>Find Company historical prices</h1>
 
     {{ include('company/_form.html.twig') }}
-
-    <a href="{{ path('app_company_index') }}">back to list</a>
 {% endblock %}

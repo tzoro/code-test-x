@@ -8,4 +8,4 @@ kernel:
 
 root_route_config:
     path: /
-    controller: App\Controller\CompanyController::index
+    controller: App\Controller\CompanyController::new
