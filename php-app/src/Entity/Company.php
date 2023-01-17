@@ -1,28 +1,16 @@
 <?php
 
 namespace App\Entity;
-
-use App\Repository\CompanyRepository;
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 use App\Validator as CompanySymbolAssert;
 
-#[ORM\Entity(repositoryClass: CompanyRepository::class)]
 class Company
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
-    #[ORM\Column(length: 255)]
     #[Assert\Regex('/[A-Z]/')]
     #[CompanySymbolAssert\CompanySymbol()]
     private ?string $CompanySymbol = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\LessThanOrEqual('today')]
     #[Assert\Expression(
         "this.getStartDate() <= this.getEndDate()",
@@ -30,7 +18,6 @@ class Company
     )]
     private ?\DateTimeInterface $StartDate = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\LessThanOrEqual('today')]
     #[Assert\Expression(
         "this.getEndDate() >= this.getStartDate()",
@@ -38,16 +25,11 @@ class Company
     )]
     private ?\DateTimeInterface $EndDate = null;
 
-    #[ORM\Column(length: 255)]
     #[Assert\Email(
         message: 'The email {{ value }} is not a valid email.',
     )]
     private ?string $email = null;
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getCompanySymbol(): ?string
     {

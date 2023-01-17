@@ -26,8 +26,10 @@ class CompanySymbolValidator extends ConstraintValidator
             return;
         }
 
+        $emptyOrSymbol = is_null($value) ? '' : $value;
+
         $this->context->buildViolation($constraint->message)
-            ->setParameter('{{ value }}', $value)
+            ->setParameter('{{ value }}', $emptyOrSymbol)
             ->addViolation();
     }
 }
