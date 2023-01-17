@@ -11,16 +11,13 @@ class MailSender
         $this->apiKey = $env;
     }
 
-    public function send()
+    public function send(string $to, string $subject, string $body)
     {
         $email = new Mail();
         $email->setFrom("imagines.and.words@gmail.com", "Tino");
-        $email->setSubject("Sending with Twilio SendGrid is Fun");
-        $email->addTo("tino_zorotovic@epam.com", "Tino");
-        $email->addContent("text/plain", "and easy to do anywhere, even with PHP");
-        $email->addContent(
-            "text/html", "<strong>and easy to do anywhere, even with PHP</strong>"
-        );
+        $email->setSubject($subject);
+        $email->addTo($to, strtoupper($to));
+        $email->addContent("text/plain", $body);
         $sendgrid = new \SendGrid($this->apiKey);
         try {
             $response = $sendgrid->send($email);

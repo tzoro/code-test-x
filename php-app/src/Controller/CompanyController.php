@@ -26,7 +26,6 @@ class CompanyController extends AbstractController
     #[Route('/new', name: 'app_company_new', methods: ['GET', 'POST'])]
     public function new(Request $request, CompanyRepository $companyRepository, MailSender $mailSender): Response
     {
-
         $company = new Company();
         $form = $this->createForm(CompanyType::class, $company);
         $form->handleRequest($request);
@@ -34,7 +33,11 @@ class CompanyController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $companyRepository->save($company, true);
 
-            $mailSender->send();
+            $mailSender->send(
+                $company->getEmail(),
+                $company->getCompanySymbol(),
+                'From ' . $company->getStartDate()->format('Y-m-d') . ' to ' . $company->getEndDate()->format('Y-m-d')
+            );
 
             return $this->redirectToRoute('app_company_index', [], Response::HTTP_SEE_OTHER);
         }
