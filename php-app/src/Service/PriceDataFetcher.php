@@ -19,7 +19,8 @@ class PriceDataFetcher
         ];
 
         $response = $curlGet->getData($url, $headers);
+        $response = json_decode($response);
 
-        return json_decode($response)->prices;
+        return isset($response->prices) ? $response->prices : [];
     }
 }
