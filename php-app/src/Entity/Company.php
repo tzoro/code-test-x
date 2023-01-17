@@ -7,10 +7,12 @@ use App\Validator as CompanySymbolAssert;
 
 class Company
 {
+    #[Assert\NotBlank]
     #[Assert\Regex('/[A-Z]/')]
     #[CompanySymbolAssert\CompanySymbol()]
     private ?string $CompanySymbol = null;
 
+    #[Assert\NotBlank]
     #[Assert\LessThanOrEqual('today')]
     #[Assert\Expression(
         "this.getStartDate() <= this.getEndDate()",
@@ -18,6 +20,7 @@ class Company
     )]
     private ?\DateTimeInterface $StartDate = null;
 
+    #[Assert\NotBlank]
     #[Assert\LessThanOrEqual('today')]
     #[Assert\Expression(
         "this.getEndDate() >= this.getStartDate()",
@@ -25,6 +28,7 @@ class Company
     )]
     private ?\DateTimeInterface $EndDate = null;
 
+    #[Assert\NotBlank]
     #[Assert\Email(
         message: 'The email {{ value }} is not a valid email.',
     )]
