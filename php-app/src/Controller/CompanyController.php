@@ -6,6 +6,7 @@ use App\Entity\Company;
 use App\Service\CurlGet;
 use App\Form\CompanyType;
 use App\Service\MailSender;
+use App\Service\GraphDataProcessor;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class CompanyController extends AbstractController
 {
     #[Route('/new', name: 'app_company_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, MailSender $mailSender, CurlGet $curlGet): Response
+    public function new(Request $request, MailSender $mailSender, CurlGet $curlGet, GraphDataProcessor $graphDataProcessor): Response
     {
         $company = new Company();
         $form = $this->createForm(CompanyType::class, $company);
@@ -30,7 +31,7 @@ class CompanyController extends AbstractController
             );
 
             $prices = $this->getHistoricalPrices($company->getCompanySymbol(), $curlGet);
-            $graphData = $this->getGraphData($prices);
+            $graphData = $graphDataProcessor->getGraphData($prices);
 
             return $this->render('company/show.html.twig', [
                 'company' => $company,
@@ -44,22 +45,6 @@ class CompanyController extends AbstractController
             'company' => $company,
             'form' => $form,
         ]);
-    }
-
-    private function getGraphData(Array $prices): \stdClass
-    {
-        $graphData = new \stdClass();
-        $graphData->open = [];
-        $graphData->close = [];
-
-        foreach ($prices as $key => $value) {
-            if( isset($value->open) && isset($value->close) ) {
-                array_push($graphData->open, [$value->date, $value->open]);
-                array_push($graphData->close, [$value->date, $value->close]);
-            }
-        }
-
-        return $graphData;
     }
 
     private function getHistoricalPrices(string $company, CurlGet $curlGet): Array
