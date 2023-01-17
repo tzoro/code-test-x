@@ -22,5 +22,7 @@ services:
             - '../src/Kernel.php'
     App\Service\MailSender:
         arguments: ['%app.sendgrid_api_key%']
+    App\Service\PriceDataFetcher:
+        arguments: ['%app.rapid_api_key%']
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

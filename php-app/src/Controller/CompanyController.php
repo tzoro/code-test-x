@@ -7,6 +7,7 @@ use App\Service\CurlGet;
 use App\Form\CompanyType;
 use App\Service\MailSender;
 use App\Service\GraphDataProcessor;
+use App\Service\PriceDataFetcher;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,7 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class CompanyController extends AbstractController
 {
     #[Route('/new', name: 'app_company_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, MailSender $mailSender, CurlGet $curlGet, GraphDataProcessor $graphDataProcessor): Response
+    public function new(Request $request, MailSender $mailSender, CurlGet $curlGet, PriceDataFetcher $priceDataFetcher, GraphDataProcessor $graphDataProcessor): Response
     {
         $company = new Company();
         $form = $this->createForm(CompanyType::class, $company);
@@ -30,7 +31,7 @@ class CompanyController extends AbstractController
                 'From ' . $company->getStartDate()->format('Y-m-d') . ' to ' . $company->getEndDate()->format('Y-m-d')
             );
 
-            $prices = $this->getHistoricalPrices($company->getCompanySymbol(), $curlGet);
+            $prices = $priceDataFetcher->getHistoricalPrices($company->getCompanySymbol(), $curlGet);
             $graphData = $graphDataProcessor->getGraphData($prices);
 
             return $this->render('company/show.html.twig', [
@@ -45,19 +46,5 @@ class CompanyController extends AbstractController
             'company' => $company,
             'form' => $form,
         ]);
-    }
-
-    private function getHistoricalPrices(string $company, CurlGet $curlGet): Array
-    {
-        $url = "https://yh-finance.p.rapidapi.com/stock/v3/get-historical-data?symbol=" . $company . "&region=US";
-
-        $headers = [
-            "X-RapidAPI-Host: yh-finance.p.rapidapi.com",
-            "X-RapidAPI-Key: " . $this->getParameter('app.rapid_api_key')
-        ];
-
-        $response = $curlGet->getData($url, $headers);
-
-        return json_decode($response)->prices;
     }
 }
