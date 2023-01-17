@@ -21,7 +21,8 @@
         "symfony/security-csrf": "6.0.*",
         "symfony/twig-bundle": "6.0.*",
         "symfony/validator": "6.0.*",
-        "symfony/yaml": "6.0.*"
+        "symfony/yaml": "6.0.*",
+        "sendgrid/sendgrid": "~7"
     },
     "require-dev": {
         "kint-php/kint": "^5.0",
